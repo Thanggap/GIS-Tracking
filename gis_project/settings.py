@@ -195,14 +195,17 @@ WSGI_APPLICATION = 'gis_project.wsgi.application'
 DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://thang:tHYpU5400sffhVJjus1QKHDBBD7LxyiW@dpg-cvvu9f3uibrs73bq6ja0-a/gisdb_fx8w')
 
 # Database - dùng postgresql local hoặc biến môi trường khi deploy
+# filepath: d:\AI\GIS-TRACKING\GIS-Tracking\gis_project\settings.py
+import os
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DB_NAME', 'gisdb'),
-        'USER': os.environ.get('DB_USER', 'postgres'),
-        'PASSWORD': os.environ.get('DB_PASSWORD', '123123'),
-        'HOST': os.environ.get('DB_HOST', 'localhost'),
-        'PORT': os.environ.get('DB_PORT', '5432'),
+        'NAME': os.environ.get('DB_NAME'),
+        'USER': os.environ.get('DB_USER'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
+        'PORT': os.environ.get('DB_PORT'),
     }
 }
 
