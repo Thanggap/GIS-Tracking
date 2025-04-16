@@ -1,0 +1,50 @@
+{% extends 'tracking/master.html' %}
+{% load static %}
+
+{% block title %}
+  Bản đồ theo dõi vị trí
+{% endblock %}
+
+{% block content %}
+
+  {% if not user.is_authenticated %}
+  <script>
+    if (confirm("Bạn đang xem ở chế độ khách. Bạn có muốn đăng nhập không?")) {
+      window.location.href = "{% url 'login' %}";
+    }
+  </script>
+  {% endif %}
+
+  <section id="map" class="section" style="padding-top: 100px;">
+    <div class="container">
+      <h3 class="text-center mb-4">Vị trí người dùng (Realtime)</h3>
+
+      <!-- THANH TÌM KIẾM đưa xuống dưới tiêu đề -->
+      <div class="row mb-4 justify-content-center">
+        <div class="col-md-8">
+          <div class="input-group">
+            <input type="text" id="searchUser" class="form-control" placeholder="Nhập tên người dùng cần tìm" />
+            <button class="btn btn-outline-primary" id="btnSearch">Tìm</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="mapid" style="height: 600px; border-radius: 10px;"></div>
+    </div>
+  </section>
+
+  <!-- Leaflet CSS + JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Plugin Fullscreen cho Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.css" />
+  <script src="https://unpkg.com/leaflet.fullscreen@1.6.0/Control.FullScreen.js"></script>
+
+  <!-- SCRIPT -->
+  <script src="https://unpkg.com/@mapbox/polyline"></script>
+  <script>
+    const USER_IS_LOGGED_IN = {{ user.is_authenticated|yesno:"true,false" }};
+  </script>
+  <script src="{% static 'tracking/js/map.js' %}"></script>  
+{% endblock %}

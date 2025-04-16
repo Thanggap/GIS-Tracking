@@ -1,0 +1,116 @@
+{% extends 'tracking/master.html' %}
+{% load static %}
+
+{% block title %}Trang chủ - Realtime GIS Tracking{% endblock %}
+
+{% block content %}
+<style>
+img.about-map {
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+img.about-map:hover {
+  transform: scale(1.03);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+}
+
+</style>
+<!-- Hero Section -->
+<section id="hero" class="hero section">
+  <div class="container">
+    <div class="row gy-4">
+      <div class="col-lg-6 order-2 order-lg-1 d-flex flex-column justify-content-center">
+        <h1 data-aos="fade-up">Theo dõi vị trí người dùng theo thời gian thực với GIS</h1>
+        <p data-aos="fade-up" data-aos-delay="100">Ứng dụng giúp hiển thị vị trí trực tuyến của người dùng, hỗ trợ định tuyến thông minh và cập nhật vị trí liên tục qua bản đồ Leaflet.</p>
+        <div class="d-flex flex-column flex-md-row" data-aos="fade-up" data-aos-delay="200">
+          <a href="{% url 'map' %}" class="btn-get-started">Bắt đầu ngay <i class="bi bi-arrow-right"></i></a>
+        </div>
+      </div>
+      <div class="col-lg-6 order-1 order-lg-2 hero-img" data-aos="zoom-out">
+        <img src="{% static 'tracking/img/worldmap.png' %}" class="img-fluid animated" alt="GIS Map">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="about section">
+  <div class="container" data-aos="fade-up">
+    <div class="row gx-0">
+      <div class="col-lg-6 d-flex flex-column justify-content-center" data-aos="fade-up" data-aos-delay="200">
+        <div class="content">
+          <h3>Giới thiệu hệ thống</h3>
+          <h2>Realtime User Tracking sử dụng công nghệ GIS & Leaflet</h2>
+          <p>
+            Hệ thống cho phép người dùng tạo tài khoản, đăng nhập, chia sẻ vị trí hiện tại, đồng thời xem vị trí của người khác theo thời gian thực. Dữ liệu định vị được cập nhật liên tục trên bản đồ Leaflet, giúp dễ dàng quản lý và theo dõi người dùng theo thời gian thực.
+          </p>
+          <div class="text-center text-lg-start">
+            <a href="#team" class="btn-read-more d-inline-flex align-items-center justify-content-center align-self-center">
+              <span>Xem thêm</span>
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 d-flex align-items-center" data-aos="zoom-out" data-aos-delay="200">
+        <img src="{% static 'tracking/img/about-map.png' %}" class="img-fluid about-map" alt="About Map">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Team Section -->
+<section id="team" class="team section">
+  <div class="container section-title" data-aos="fade-up">
+    <h2>Nhóm phát triển</h2>
+    <p>Đội ngũ thực hiện dự án GIS Realtime Tracking</p>
+  </div>
+
+  <div class="container">
+    <div class="row gy-4">
+
+      <div class="col-lg-4 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="100">
+        <div class="team-member">
+          <div class="member-img">
+            <img src="{% static 'assets/img/team/member-1.jpg' %}" class="img-fluid" alt="">
+          </div>
+          <div class="member-info">
+            <h4>Nguyễn Văn A</h4>
+            <span>Frontend Developer</span>
+            <p>Thiết kế giao diện bản đồ thời gian thực và tối ưu trải nghiệm người dùng với Leaflet.js</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="200">
+        <div class="team-member">
+          <div class="member-img">
+            <img src="{% static 'assets/img/team/member-2.jpg' %}" class="img-fluid" alt="">
+          </div>
+          <div class="member-info">
+            <h4>Trần Thị B</h4>
+            <span>Backend Developer</span>
+            <p>Xây dựng hệ thống API thời gian thực với Django REST Framework và MySQL</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6 d-flex align-items-stretch" data-aos="fade-up" data-aos-delay="300">
+        <div class="team-member">
+          <div class="member-img">
+            <img src="{% static 'assets/img/team/member-3.jpg' %}" class="img-fluid" alt="">
+          </div>
+          <div class="member-info">
+            <h4>Lê Văn C</h4>
+            <span>GIS Analyst</span>
+            <p>Phân tích dữ liệu vị trí và tích hợp thuật toán tìm đường đi ngắn nhất (Dijkstra, A*)</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+{% endblock %}
