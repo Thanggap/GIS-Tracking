@@ -191,6 +191,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'gis_project.wsgi.application'
+
 DATABASE_URL = os.environ.get('DATABASE_URL', 'postgresql://thang:tHYpU5400sffhVJjus1QKHDBBD7LxyiW@dpg-cvvu9f3uibrs73bq6ja0-a/gisdb_fx8w')
 
 # Database - dùng postgresql local hoặc biến môi trường khi deploy
