@@ -1,0 +1,37 @@
+{% load static %}
+
+<header id="header" class="header d-flex align-items-center">
+  <div class="container-fluid container-xl position-relative d-flex align-items-center">
+    <a href="{% url 'home' %}" class="logo d-flex align-items-center me-auto">
+      <img src="{% static 'tracking/img/LOGO/logo.png' %}" alt="Realtime GIS Logo" class="main-logo" />
+    </a>
+
+    <nav id="navmenu" class="navmenu">
+      <ul>
+        <li>
+          <a href="{% url 'home' %}" class="{% if request.path == '/' %}active{% endif %}">Trang chủ</a>
+        </li>
+        <li>
+          <a href="{% url 'map' %}" class="{% if request.path == '/map/' %}active{% endif %}">Bản đồ</a>
+        </li>
+      
+        {% if user.is_authenticated %}
+          <li>
+            <a href="{% url 'profile' %}" class="{% if request.path == '/profile/' %}active{% endif %}">Xin chào, {{ user.username }}</a>
+          </li>
+          <li>
+            <a href="{% url 'logout' %}">Đăng xuất</a>
+          </li>
+        {% else %}
+          <li>
+            <a href="{% url 'login' %}" class="{% if request.path == '/login/' %}active{% endif %}">Đăng nhập</a>
+          </li>
+          <li>
+            <a href="{% url 'register' %}" class="{% if request.path == '/register/' %}active{% endif %}">Đăng ký</a>
+          </li>
+        {% endif %}
+      </ul>      
+      <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+    </nav>
+  </div>
+</header>
