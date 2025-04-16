@@ -3,9 +3,9 @@ services:
     name: my-django-app
     env: python
     buildCommand: ""
-    startCommand: "gunicorn myproject.wsgi:application"
+    startCommand: "gunicorn gis_project.wsgi:application"
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: gis_project.settings
       - key: PYTHON_VERSION
-        value: 3.13.1
+        value: 3.11.11
