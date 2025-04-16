@@ -3,7 +3,10 @@ services:
     name: my-django-app
     env: python
     buildCommand: ""
-    startCommand: "gunicorn gis_project.wsgi:application --bind 0.0.0.0:$PORT"
+    startCommand: >
+      python manage.py makemigrations tracking &&
+      python manage.py migrate &&
+      gunicorn gis_project.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: DJANGO_SETTINGS_MODULE
         value: gis_project.settings
