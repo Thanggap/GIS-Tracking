@@ -1,6 +1,7 @@
-let myLat = null, myLng = null
+let myLat = null, myLng = null  // Biến toàn cục để lưu vị trí hiện tại của người dùng
 
 document.addEventListener('DOMContentLoaded', function () {
+    // Khởi tạo bản đồ Leaflet
     const map = L.map('mapid', {
         center: [10.762622, 106.660172],
         zoom: 13,
@@ -11,15 +12,17 @@ document.addEventListener('DOMContentLoaded', function () {
             titleCancel: "Exit Fullscreen"
         }
     })
-    let routeLayer = null
+    let routeLayer = null // Layer tuyến đường tìm được sẽ được gắn vào biến này để có thể xóa nếu cần
 
+    // Thêm lớp tile từ OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         maxZoom: 19,
         attribution: '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a> contributors'
     }).addTo(map)
 
-    const userIsLoggedIn = USER_IS_LOGGED_IN
+    const userIsLoggedIn = USER_IS_LOGGED_IN  // Biến truyền từ template: kiểm tra người dùng đã đăng nhập chưa
 
+    // Nếu đã đăng nhập thì gọi API để hiển thị tất cả vị trí người dùng
     if (userIsLoggedIn) {
         fetch('/api/get_all_locations/')
             .then((response) => {
@@ -28,14 +31,33 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then((data) => {
                 data.forEach((loc) => {
-                    const marker = L.marker([loc.latitude, loc.longitude]).addTo(map)
+                    // Tạo marker với avatar làm biểu tượng
+                    const icon = L.icon({
+                        iconUrl: `/static/${loc.avatar}`,
+                        iconSize: [42, 42],
+                        iconAnchor: [21, 42],
+                        popupAnchor: [0, -45],
+                        className: 'user-avatar-icon'
+                    })
+
+                    const marker = L.marker([loc.latitude, loc.longitude], { icon }).addTo(map)
+
+                    // Gắn popup hiển thị tên + thời gian + nút tìm đường
+                    const timestamp = new Date(loc.timestamp)
+                    const formattedTime = timestamp.toLocaleString('vi-VN', {
+                        timeZone: 'Asia/Ho_Chi_Minh',
+                        hour12: false
+                    })
+                    
                     marker.bindPopup(`
-              <b>${loc.user}</b><br>${loc.timestamp}<br>
-              <button class="btn btn-sm btn-primary mt-2 route-btn"
-                      data-lat="${loc.latitude}" data-lng="${loc.longitude}">
-                Tìm đường đi
-              </button>
-            `)
+                      <b>${loc.user}</b><br>
+                      Cập nhật lúc: ${formattedTime} (GMT+7)<br>
+                      Tọa độ: ${loc.latitude.toFixed(5)}, ${loc.longitude.toFixed(5)}<br>
+                      <button class="btn btn-sm btn-primary mt-2 route-btn"
+                              data-lat="${loc.latitude}" data-lng="${loc.longitude}">
+                        Tìm đường đi
+                      </button>
+                    `)
                 })
             })
             .catch((err) => {
@@ -44,6 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
     }
 
+    // Xử lý khi người dùng tìm kiếm tên người khác
     document.getElementById('btnSearch').addEventListener('click', function () {
         if (!userIsLoggedIn) {
             window.location.href = '/login/'
@@ -56,6 +79,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return
         }
 
+        // Gọi API để lấy vị trí người dùng cụ thể theo tên
         fetch(`/api/get_user_location/${username}/`)
             .then((response) => {
                 if (!response.ok) throw new Error('Không tìm thấy người dùng hoặc chưa có vị trí.')
@@ -64,6 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
             .then((loc) => {
                 const { latitude, longitude, timestamp } = loc
 
+                // Hiển thị marker với icon mặc định (không phải avatar)
                 const marker = L.marker([latitude, longitude], {
                     icon: L.icon({
                         iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -73,13 +98,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     })
                 }).addTo(map)
 
+                // Gắn popup có nút tìm đường đi đến vị trí user đó
                 marker.bindPopup(`
-            <b>${username}</b><br>${timestamp}<br>
-            <button class="btn btn-sm btn-primary mt-2 route-btn"
-                    data-lat="${latitude}" data-lng="${longitude}">
-              Tìm đường đi
-            </button>
-          `).openPopup()
+                    <b>${username}</b><br>${timestamp}<br>
+                    <button class="btn btn-sm btn-primary mt-2 route-btn"
+                            data-lat="${latitude}" data-lng="${longitude}">
+                      Tìm đường đi
+                    </button>
+                `).openPopup()
 
                 map.setView([latitude, longitude], 16)
             })
@@ -88,6 +114,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
     })
 
+    // Khi mở popup chứa nút "Tìm đường đi", gắn sự kiện click cho nút đó
     map.on('popupopen', function (e) {
         const button = e.popup._contentNode.querySelector('.route-btn')
         if (button) {
@@ -101,6 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     return
                 }
 
+                // Gọi OpenRouteService để tìm tuyến đường từ vị trí hiện tại đến đích
                 fetch('https://api.openrouteservice.org/v2/directions/driving-car?geometry_format=geojson', {
                     method: 'POST',
                     headers: {
@@ -114,22 +142,25 @@ document.addEventListener('DOMContentLoaded', function () {
                     .then((res) => res.json())
                     .then((data) => {
                         console.log('Dữ liệu định tuyến trả về:', data)
-                      
+
                         if (!data || !data.routes || data.routes.length === 0) {
-                          alert('Không thể tìm đường đi (không có dữ liệu định tuyến).')
-                          return
+                            alert('Không thể tìm đường đi (không có dữ liệu định tuyến).')
+                            return
                         }
-                      
+
+                        // Giải mã tuyến đường được mã hóa (polyline)
                         const encoded = data.routes[0].geometry
                         const coords = polyline.decode(encoded)
-                      
+
                         if (routeLayer) {
-                          map.removeLayer(routeLayer)
+                            map.removeLayer(routeLayer)
                         }
-                      
+
+                        // Vẽ tuyến đường trên bản đồ
                         routeLayer = L.polyline(coords, { color: 'blue', weight: 4 }).addTo(map)
                         map.fitBounds(routeLayer.getBounds(), { padding: [50, 50] })
 
+                        // Hiển thị popup giữa đường đi với quãng đường và thời gian
                         const distanceMeters = data.routes[0].summary.distance
                         const durationSeconds = data.routes[0].summary.duration
 
@@ -138,11 +169,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         const midIndex = Math.floor(coords.length / 2)
                         const midPoint = coords[midIndex]
-                       
+
                         L.popup()
-                        .setLatLng(midPoint)
-                        .setContent(`<b>📍 ${distanceKm} km<br>🕒 ${durationMin} phút</b>`)
-                        .openOn(map)                        
+                            .setLatLng(midPoint)
+                            .setContent(`<b>📍 ${distanceKm} km<br>🕒 ${durationMin} phút</b>`)
+                            .openOn(map)
                     })
                     .catch((err) => {
                         console.error('Lỗi khi tìm đường:', err)
@@ -152,11 +183,15 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     })
 
+    // Bắt đầu cập nhật vị trí hiện tại khi load trang
     updateUserLocation()
-    setInterval(updateUserLocation, 10000)
-    
+    setInterval(updateUserLocation, 10000)  // Cập nhật mỗi 10 giây
 })
 
+
+/**
+ * Hàm định vị người dùng hiện tại và cập nhật lên server qua API
+ */
 function updateUserLocation() {
     if (!navigator.geolocation) {
         alert('Trình duyệt của bạn không hỗ trợ định vị.')
@@ -171,6 +206,7 @@ function updateUserLocation() {
             myLng = longitude
             console.log('Đã định vị:', myLat, myLng)
 
+            // Gửi vị trí lên server để cập nhật
             fetch('/api/update_location/', {
                 method: 'POST',
                 headers: {
@@ -193,6 +229,10 @@ function updateUserLocation() {
     )
 }
 
+
+/**
+ * Hàm lấy CSRF token từ cookie để gửi kèm trong các request POST
+ */
 function getCSRFToken() {
     const name = 'csrftoken'
     const cookies = document.cookie.split(';')
@@ -204,5 +244,3 @@ function getCSRFToken() {
     }
     return ''
 }
-
-

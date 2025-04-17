@@ -3,28 +3,16 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login as auth_login, logout, get_user_model, login
+from django.contrib.auth import authenticate, login as auth_login, logout, get_user_model, login, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib import messages
 
 from .models import User, Location
-from .serializers import RegisterSerializer, LoginSerializer, LocationSerializer
-
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from django.contrib.auth.models import User
-from django.contrib.auth import update_session_auth_hash
-
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.shortcuts import render, redirect
+from .serializers import RegisterSerializer, LoginSerializer, LocationSerializer, LocationCreateSerializer
 from .forms import UpdateProfileForm
 
-from django.contrib.auth import update_session_auth_hash
-from django.contrib.auth.forms import PasswordChangeForm
-
 import os
-from django.conf import settings
 
 User = get_user_model()
 
@@ -33,9 +21,12 @@ User = get_user_model()
 # ---------------------
 
 def home_view(request):
+    """Hiển thị trang chủ"""
     return render(request, 'tracking/home.html')
 
+
 def login_view(request):
+    """Đăng nhập qua form HTML"""
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
@@ -47,7 +38,9 @@ def login_view(request):
             return render(request, 'tracking/login.html', {'form': {'errors': True}})
     return render(request, 'tracking/login.html')
 
+
 def register_view(request):
+    """Đăng ký tài khoản mới"""
     if request.method == 'POST':
         username = request.POST['username']
         email = request.POST.get('email', '')
@@ -68,10 +61,13 @@ def register_view(request):
 
 
 def map_view(request):
+    """Hiển thị bản đồ người dùng"""
     return render(request, 'tracking/map.html')
+
 
 @login_required
 def profile_view(request):
+    """Hiển thị & cập nhật avatar người dùng"""
     avatar_dir = os.path.join(os.path.dirname(__file__), 'static', 'tracking', 'avatar')
     avatars = os.listdir(avatar_dir)
 
@@ -82,12 +78,12 @@ def profile_view(request):
             request.user.save()
             return redirect('profile')
 
-    return render(request, 'tracking/profile.html', {
-        'avatars': avatars,
-    })
+    return render(request, 'tracking/profile.html', {'avatars': avatars})
+
 
 @login_required
 def update_profile_view(request):
+    """Cập nhật username / email người dùng"""
     if request.method == 'POST':
         form = UpdateProfileForm(request.POST, instance=request.user)
         if form.is_valid():
@@ -101,23 +97,27 @@ def update_profile_view(request):
 
     return render(request, 'tracking/update_profile.html', {'form': form})
 
+
 @login_required
 def change_password_view(request):
+    """Đổi mật khẩu người dùng"""
     if request.method == 'POST':
         form = PasswordChangeForm(user=request.user, data=request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # Giữ đăng nhập
+            update_session_auth_hash(request, user)
             messages.success(request, 'Đổi mật khẩu thành công!')
             return redirect('profile')
         else:
             messages.error(request, 'Có lỗi, vui lòng kiểm tra lại.')
     else:
         form = PasswordChangeForm(user=request.user)
-    
+
     return render(request, 'tracking/change_password.html', {'form': form})
 
+
 def logout_view(request):
+    """Đăng xuất người dùng"""
     logout(request)
     return redirect('login')
 
@@ -126,9 +126,12 @@ def logout_view(request):
 # ---------------------
 
 class RegisterView(generics.CreateAPIView):
+    """API - Đăng ký người dùng"""
     serializer_class = RegisterSerializer
 
+
 class LoginView(APIView):
+    """API - Đăng nhập người dùng"""
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -136,22 +139,28 @@ class LoginView(APIView):
             return Response({"message": "Login successful"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class LogoutView(APIView):
+    """API - Đăng xuất người dùng"""
     def post(self, request):
         logout(request)
         return Response({"message": "Logout successful"})
-    
+
+
 class LocationUpdateView(APIView):
+    """API - Cập nhật vị trí hiện tại của người dùng"""
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        serializer = LocationSerializer(data=request.data)
+        serializer = LocationCreateSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response({"message": "Location updated"})
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 class LocationFetchView(APIView):
+    """API - Lấy vị trí gần nhất của 1 người dùng theo tên"""
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, username):
@@ -165,7 +174,9 @@ class LocationFetchView(APIView):
         except Location.DoesNotExist:
             return Response({"error": "No location data found"}, status=404)
 
+
 class AllUserLocationsView(APIView):
+    """API - Lấy vị trí gần nhất của tất cả người dùng"""
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
