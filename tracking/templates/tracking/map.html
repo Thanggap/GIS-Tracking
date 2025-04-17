@@ -6,13 +6,20 @@
 {% endblock %}
 
 {% block content %}
+  <style>
+    .leaflet-marker-icon.user-avatar-icon {
+      border-radius: 50%;
+      border: 2px solid white;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+    }
+  </style>
 
   {% if not user.is_authenticated %}
-  <script>
-    if (confirm("Bạn đang xem ở chế độ khách. Bạn có muốn đăng nhập không?")) {
-      window.location.href = "{% url 'login' %}";
-    }
-  </script>
+    <script>
+      if (confirm('Bạn đang xem ở chế độ khách. Bạn có muốn đăng nhập không?')) {
+        window.location.href = "{% url 'login' %}"
+      }
+    </script>
   {% endif %}
 
   <section id="map" class="section" style="padding-top: 100px;">
@@ -44,7 +51,7 @@
   <!-- SCRIPT -->
   <script src="https://unpkg.com/@mapbox/polyline"></script>
   <script>
-    const USER_IS_LOGGED_IN = {{ user.is_authenticated|yesno:"true,false" }};
+    const USER_IS_LOGGED_IN = "{{ user.is_authenticated|yesno:'true,false'|escapejs }}"
   </script>
-  <script src="{% static 'tracking/js/map.js' %}"></script>  
+  <script src="{% static 'tracking/js/map.js' %}"></script>
 {% endblock %}

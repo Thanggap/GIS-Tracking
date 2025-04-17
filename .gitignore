@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+.env
+*.sqlite3
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+*.log
+
+# VS Code
+.vscode/
+
+# MySQL
+*.sql
+
+# Migrations
+**/migrations/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+*.pem
+*.key
+secret.*

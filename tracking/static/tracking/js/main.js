@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
 * Template Name: FlexStart
 * Template URL: https://bootstrapmade.com/flexstart-bootstrap-startup-template/
@@ -7,6 +8,9 @@
 */
 
 (function() {
+=======
+(function () {
+>>>>>>> gis-realtime-tracking/main
   "use strict";
 
   /**
@@ -52,7 +56,11 @@
    * Toggle mobile nav dropdowns
    */
   document.querySelectorAll('.navmenu .toggle-dropdown').forEach(navmenu => {
+<<<<<<< HEAD
     navmenu.addEventListener('click', function(e) {
+=======
+    navmenu.addEventListener('click', function (e) {
+>>>>>>> gis-realtime-tracking/main
       e.preventDefault();
       this.parentNode.classList.toggle('active');
       this.parentNode.nextElementSibling.classList.toggle('dropdown-active');
@@ -102,6 +110,7 @@
   });
 
   /**
+<<<<<<< HEAD
    * Initiate Pure Counter
    */
   new PureCounter();
@@ -171,6 +180,11 @@
    * Correct scrolling position upon page load for URLs containing hash links.
    */
   window.addEventListener('load', function(e) {
+=======
+   * Correct scrolling position upon page load for URLs containing hash links.
+   */
+  window.addEventListener('load', function (e) {
+>>>>>>> gis-realtime-tracking/main
     if (window.location.hash) {
       if (document.querySelector(window.location.hash)) {
         setTimeout(() => {
@@ -207,4 +221,8 @@
   window.addEventListener('load', navmenuScrollspy);
   document.addEventListener('scroll', navmenuScrollspy);
 
+<<<<<<< HEAD
 })();
+=======
+})();
+>>>>>>> gis-realtime-tracking/main
